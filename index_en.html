@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stamp Mock-Up Preview</title>
+  <style>
+    @font-face {
+      font-family: 'MarshStencil';
+      src: url('https://cdn.jsdelivr.net/gh/Nukl34r20m813/MarshStencil@main/marsh_stencil_regular-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'ComicSansMS';
+      src: url('https://cdn.jsdelivr.net/gh/Nukl34r20m813/MarshStencil@main/comic_sans_ms-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'ArialNarrow';
+      src: url('https://cdn.jsdelivr.net/gh/Nukl34r20m813/MarshStencil@main/arialnarrow-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'ArialNarrow';
+      src: url('https://cdn.jsdelivr.net/gh/Nukl34r20m813/MarshStencil@main/arialnarrow_bold-webfont.woff2') format('woff2');
+      font-weight: bold;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+  .container {
+  width: 100%;
+  max-width: 900px;
+  min-width: 0;              /* <- Never wider than viewport */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  padding: 20px;
+  box-sizing: border-box;    /* Important for proper width */
+}
+    h2 { text-align: center; margin-bottom: 20px; }
+    .form-group { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
+    .form-group label { flex: 0 0 100px; font-weight: bold; margin-bottom: 5px; }
+    .form-group input[type="text"], .form-group select { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; transition: border-color 0.2s; }
+
+#outputBox {
+  width: 100%;
+  max-width: 700px;
+  min-width: 0;
+  border: 2px solid #333;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0px;
+  background-size: cover;
+  background-position: center;
+  margin: 0 auto 10px;
+  position: relative;
+  aspect-ratio: 6 / 1; /* Default, JS overrides */
+}
+
+    #textContent {
+      white-space: nowrap;
+      overflow: hidden;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    .min-height-line {
+      position: absolute;
+      width: 60px;
+      height: 2px;
+      background: #e53935;
+      z-index: 2;
+      opacity: 0.9;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .top-left {
+      top: 17%; left: 0;
+      transform: translateY(-50%);
+    }
+    .top-right {
+      top: 17%; right: 0;
+      transform: translateY(-50%);
+    }
+    .bottom-left {
+      bottom: 17%; left: 0;
+      transform: translateY(50%);
+    }
+    .bottom-right {
+      bottom: 17%; right: 0;
+      transform: translateY(50%);
+    }
+
+    .hint {
+      text-align: left;
+      font-size: 0.95rem;
+      color: #444;
+      margin-top: 18px;
+      padding: 0;
+    }
+    .info-list {
+      margin: 0;
+      padding-left: 1.2em;
+      text-align: left;
+      color: #555;
+      font-size: 0.97em;
+      line-height: 1.6;
+      list-style-position: outside;
+    }
+    @media (max-width: 750px) {
+      body {
+        display: block;
+        padding: 0;
+        overflow-x: hidden;
+      }
+      .container {
+        min-width: 0;
+        width: 100vw;
+        max-width: 100vw;
+        box-sizing: border-box;
+        padding: 10px 0 10px -10;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      #outputBox {
+        min-width: 0;
+        max-width: 98vw;
+    
+      }
+      .min-height-line { width: 25px; }
+      .info-list, .hint {
+        font-size: 0.97em;
+        line-height: 1.5;
+        padding-left: 0.7em;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Preview your stamp</h2>
+  <div id="outputBox">
+    <div class="min-height-line top-left"></div>
+    <div class="min-height-line top-right"></div>
+    <div class="min-height-line bottom-left"></div>
+    <div class="min-height-line bottom-right"></div>
+    <span id="textContent"></span>
+  </div>
+  <div id="sizeInfo" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
+
+  <div class="form-group">
+    <label for="inputText">Text:</label>
+    <input type="text" id="inputText" placeholder="Enter your text...">
+  </div>
+  <div class="form-group">
+    <label for="stampLengthSelect">Version:</label>
+    <select id="stampLengthSelect">
+      <option value="6">10 cm text length</option>
+      <option value="11">20 cm text length</option>
+      <option value="17">30 cm text length</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="fontSelect">Font:</label>
+    <select id="fontSelect">
+      <option value="Arial">Arial</option>
+      <option value="ArialNarrow">Arial Narrow</option>
+      <option value="ComicSansMS">Comic Sans MS</option>
+      <option value="MarshStencil">Marsh Stencil</option>
+    </select>
+    <input type="color" id="textColor" value="#000000">
+    <input type="checkbox" id="boldCheck">
+    <label for="boldCheck">Bold</label>
+  </div>
+  <div class="form-group">
+    <label for="backgroundSelect">Background:</label>
+    <select id="backgroundSelect">
+      <option value="https://i.imgur.com/HIdmt4L.jpeg">Wood</option>
+      <option value="https://i.imgur.com/f6RsubC.jpeg">Concrete</option>
+      <option value="https://i.imgur.com/dmRPFAs.png">Cardboard</option>
+      <option value="https://i.imgur.com/uSJq7uK.jpeg">Fabric</option>
+    </select>
+  </div>
+  <!-- Hints at the end -->
+  <div class="hint">
+    <ul class="info-list">
+      <li>This preview is only an approximation.</li>
+      <li>The red lines mark the recommended minimum height for legible text.</li>
+      <li>Guidelines between words will be added later.</li>
+      <li>Letters with descenders like <b>g</b> or <b>j</b> (and letters with ascenders like <b>Ä</b>) reduce the text height, so we recommend uppercase text if you don't use umlauts.</li>
+    </ul>
+  </div>
+</div>
+<script>
+function adjustFontSize() {
+  const outputBox = document.getElementById('outputBox');
+  const textElem = document.getElementById('textContent');
+  const inputTextField = document.getElementById('inputText');
+  const aspectRatio = document.getElementById('stampLengthSelect').value;
+  const font = document.getElementById('fontSelect').value;
+
+  let fontStack;
+  if (font === 'MarshStencil') {
+    fontStack = "'MarshStencil', Arial, sans-serif";
+  } else if (font === 'ComicSansMS') {
+    fontStack = "'ComicSansMS', Arial, sans-serif";
+  } else if (font === 'ArialNarrow') {
+    fontStack = "'ArialNarrow', Arial, sans-serif";
+  } else {
+    fontStack = "Arial, sans-serif";
+  }
+
+  const bold = document.getElementById('boldCheck').checked ? 'bold' : 'normal';
+  const textColor = document.getElementById('textColor').value;
+  let text = inputTextField.value;
+
+  // Flexible font size but minimum height indicated by lines
+  let fontSize = 200;
+  const ctx = document.createElement('canvas').getContext('2d');
+  const boxWidth = outputBox.clientWidth - 10;
+  const boxHeight = outputBox.clientHeight - 10;
+
+  // Only scale down when text is too large
+  while (fontSize > 10) {
+    ctx.font = `${bold} ${fontSize}px ${fontStack}`;
+    const metrics = ctx.measureText(text);
+    const textWidth = metrics.width;
+    const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    if (textWidth - 15 <= boxWidth && textHeight - 7 <= boxHeight) break;
+    fontSize--;
+  }
+
+  textElem.style.fontFamily = fontStack;
+  textElem.style.fontWeight = bold;
+  textElem.style.fontSize = fontSize + 'px';
+  textElem.style.color = textColor;
+  textElem.textContent = text;
+
+  // Set aspect ratio (respected on mobile and desktop)
+  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+
+  // Preview info
+  document.getElementById('sizeInfo').innerHTML =
+    `Preview equals ${getRealSize(aspectRatio)}<br><span style="font-size:0.95em;color:#3973b7;">Going below the red marks may result in poor legibility.</span>`;
+}
+
+function getRealSize(aspectRatio) {
+  if (aspectRatio == "6") return "14 x 100 mm";
+  if (aspectRatio == "11") return "14 x 200 mm";
+  if (aspectRatio == "17") return "14 x 300 mm";
+  return "";
+}
+
+function updateBackground() {
+  document.getElementById('outputBox').style.backgroundImage =
+    `url('${document.getElementById('backgroundSelect').value}')`;
+}
+
+function updateStampVersion() {
+  const aspectRatio = document.getElementById('stampLengthSelect').value;
+  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  adjustFontSize();
+}
+
+// Events
+['inputText', 'fontSelect', 'boldCheck', 'textColor'].forEach(id =>
+  document.getElementById(id).addEventListener('input', adjustFontSize));
+['backgroundSelect', 'stampLengthSelect'].forEach(id =>
+  document.getElementById(id).addEventListener('change',
+    id === 'backgroundSelect' ? updateBackground : updateStampVersion)
+);
+
+// Initial display
+adjustFontSize();
+updateBackground();
+updateStampVersion();
+</script>
+</body>
+</html>
