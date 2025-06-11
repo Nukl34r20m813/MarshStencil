@@ -180,6 +180,7 @@
       <option value="11">20 cm text length</option>
       <option value="17">30 cm text length</option>
     </select>
+    <a id="productLinkEN" href="https://www.dhinotec.com/product-page/inkrunner-set-personalisiert" target="_blank" style="margin-left:10px;padding:8px 12px;background:#007BFF;color:#fff;text-decoration:none;border-radius:4px;">View product</a>
   </div>
   <div class="form-group">
     <label for="fontSelect">Font:</label>
@@ -280,6 +281,10 @@ function updateBackground() {
 function updateStampVersion() {
   const aspectRatio = document.getElementById('stampLengthSelect').value;
   document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  const link = document.getElementById('productLinkEN');
+  if (aspectRatio == '6') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert';
+  else if (aspectRatio == '11') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert-20-cm';
+  else if (aspectRatio == '17') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert-30-cm';
   adjustFontSize();
 }
 
