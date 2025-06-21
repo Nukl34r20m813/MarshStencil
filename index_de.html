@@ -256,10 +256,13 @@ function adjustFontSize() {
   }
 
   textElem.style.fontFamily = fontStack;
-  textElem.style.fontWeight = bold;
-  textElem.style.fontSize = fontSize + 'px';
-  textElem.style.color = textColor;
-  textElem.textContent = text;
+    textElem.style.fontWeight = bold;
+    textElem.style.fontSize = fontSize + 'px';
+    textElem.style.color = textColor;
+    const isMobile = window.matchMedia('(max-width: 750px)').matches;
+    const offsetY = isMobile && font === 'MarshStencil' ? 10 : 0;
+    textElem.style.transform = isMobile ? `translateY(${offsetY}px)` : 'none';
+    textElem.textContent = text;
 
   // Setze das Seitenverhältnis (wird auf Mobil und Desktop beachtet!)
   document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
