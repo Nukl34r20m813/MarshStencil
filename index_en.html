@@ -265,6 +265,7 @@ function adjustFontSize() {
       if (aspectRatio === '6') offsetY = 7;
       else if (aspectRatio === '11') offsetY = 3;
     }
+
     textElem.style.transform = isMobile ? `translateY(${offsetY}px)` : 'none';
     textElem.textContent = text;
 
