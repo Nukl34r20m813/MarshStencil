@@ -296,10 +296,12 @@ function updateStampVersion() {
     id === 'backgroundSelect' ? updateBackground : updateStampVersion)
 );
 
-// Initial display
-adjustFontSize();
-updateBackground();
-updateStampVersion();
+// Initial display only after web fonts have loaded
+document.fonts.ready.then(() => {
+  adjustFontSize();
+  updateBackground();
+  updateStampVersion();
+});
 </script>
 </body>
 </html>
