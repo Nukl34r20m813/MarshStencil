@@ -260,7 +260,11 @@ function adjustFontSize() {
     textElem.style.fontSize = fontSize + 'px';
     textElem.style.color = textColor;
     const isMobile = window.matchMedia('(max-width: 750px)').matches;
-    const offsetY = isMobile && font === 'MarshStencil' ? 10 : 0;
+    let offsetY = 0;
+    if (isMobile && font === 'MarshStencil') {
+      if (aspectRatio === '6') offsetY = 7;
+      else if (aspectRatio === '11') offsetY = 3;
+    }
     textElem.style.transform = isMobile ? `translateY(${offsetY}px)` : 'none';
     textElem.textContent = text;
 
