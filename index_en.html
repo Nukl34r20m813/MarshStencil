@@ -292,6 +292,12 @@ function adjustFontSize() {
     textElem.style.color = textColor;
     textElem.textContent = text;
 
+  if (font === 'MarshStencil' && window.innerWidth <= 750) {
+    textElem.style.lineHeight = '0.85';
+  } else {
+    textElem.style.lineHeight = '';
+  }
+
   // Set or calculate aspect ratio
   updateAspectRatio(aspectRatio);
 
