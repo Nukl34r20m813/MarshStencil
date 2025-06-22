@@ -217,6 +217,35 @@
   </div>
 </div>
 <script>
+function loadSelectedFont() {
+  const font = document.getElementById('fontSelect').value;
+  const bold = document.getElementById('boldCheck').checked ? 'bold' : 'normal';
+  let family = 'Arial';
+  if (font === 'MarshStencil') family = 'MarshStencil';
+  else if (font === 'ComicSansMS') family = 'ComicSansMS';
+  else if (font === 'ArialNarrow') family = 'ArialNarrow';
+  return document.fonts.load(`${bold} 16px '${family}'`);
+}
+
+function updateAspectRatio(aspectRatio) {
+  const box = document.getElementById('outputBox');
+  if (CSS.supports('aspect-ratio: 1 / 1')) {
+    box.style.aspectRatio = `${aspectRatio} / 1`;
+    box.style.height = '';
+  } else {
+    box.style.aspectRatio = '';
+    const width = box.clientWidth;
+    box.style.height = (width / aspectRatio) + 'px';
+  }
+}
+
+const DESKTOP_OFFSETS = { boxPadding: 10, widthOffset: 15, heightOffset: 7 };
+const MOBILE_OFFSETS = { boxPadding: 10, widthOffset: 15, heightOffset: 7 };
+
+function getOffsets() {
+  return window.innerWidth <= 750 ? MOBILE_OFFSETS : DESKTOP_OFFSETS;
+}
+
 function adjustFontSize() {
   const outputBox = document.getElementById('outputBox');
   const textElem = document.getElementById('textContent');
@@ -242,8 +271,9 @@ function adjustFontSize() {
   // Flexible Fontgröße, aber Mindesthöhe durch Linien angezeigt
   let fontSize = 200;
   const ctx = document.createElement('canvas').getContext('2d');
-  const boxWidth = outputBox.clientWidth - 10;
-  const boxHeight = outputBox.clientHeight - 10;
+  const { boxPadding, widthOffset, heightOffset } = getOffsets();
+  const boxWidth = outputBox.clientWidth - boxPadding;
+  const boxHeight = outputBox.clientHeight - boxPadding;
 
   // Nur runterskalieren, wenn Text zu groß
   while (fontSize > 10) {
@@ -251,7 +281,8 @@ function adjustFontSize() {
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-    if (textWidth - 15 <= boxWidth && textHeight - 7 <= boxHeight) break;
+    if (textWidth - widthOffset <= boxWidth &&
+        textHeight - heightOffset <= boxHeight) break;
     fontSize--;
   }
 
@@ -261,8 +292,8 @@ function adjustFontSize() {
     textElem.style.color = textColor;
     textElem.textContent = text;
 
-  // Setze das Seitenverhältnis (wird auf Mobil und Desktop beachtet!)
-  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  // Setze oder berechne das Seitenverhältnis
+  updateAspectRatio(aspectRatio);
 
   // Vorschauinfo
   document.getElementById('sizeInfo').innerHTML =
@@ -283,7 +314,7 @@ function updateBackground() {
 
 function updateStampVersion() {
   const aspectRatio = document.getElementById('stampLengthSelect').value;
-  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  updateAspectRatio(aspectRatio);
   const link = document.getElementById('productLinkDE');
   if (aspectRatio == '6') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert';
   else if (aspectRatio == '11') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert-20-cm';
@@ -292,8 +323,17 @@ function updateStampVersion() {
 }
 
 // Events
-['inputText', 'fontSelect', 'boldCheck', 'textColor'].forEach(id =>
+['inputText', 'textColor'].forEach(id =>
   document.getElementById(id).addEventListener('input', adjustFontSize));
+
+document.getElementById('boldCheck').addEventListener('input', () => {
+  loadSelectedFont().then(adjustFontSize);
+});
+
+document.getElementById('fontSelect').addEventListener('change', () => {
+  loadSelectedFont().then(adjustFontSize);
+});
+
 ['backgroundSelect', 'stampLengthSelect'].forEach(id =>
   document.getElementById(id).addEventListener('change',
     id === 'backgroundSelect' ? updateBackground : updateStampVersion)
@@ -305,6 +345,13 @@ document.fonts.ready.then(() => {
   updateBackground();
   updateStampVersion();
 });
+
+if (!CSS.supports('aspect-ratio: 1 / 1')) {
+  window.addEventListener('resize', () => {
+    const ratio = document.getElementById('stampLengthSelect').value;
+    updateAspectRatio(ratio);
+  });
+}
 </script>
 </body>
 </html>
