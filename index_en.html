@@ -217,6 +217,28 @@
   </div>
 </div>
 <script>
+function loadSelectedFont() {
+  const font = document.getElementById('fontSelect').value;
+  const bold = document.getElementById('boldCheck').checked ? 'bold' : 'normal';
+  let family = 'Arial';
+  if (font === 'MarshStencil') family = 'MarshStencil';
+  else if (font === 'ComicSansMS') family = 'ComicSansMS';
+  else if (font === 'ArialNarrow') family = 'ArialNarrow';
+  return document.fonts.load(`${bold} 16px '${family}'`);
+}
+
+function updateAspectRatio(aspectRatio) {
+  const box = document.getElementById('outputBox');
+  if (CSS.supports('aspect-ratio: 1 / 1')) {
+    box.style.aspectRatio = `${aspectRatio} / 1`;
+    box.style.height = '';
+  } else {
+    box.style.aspectRatio = '';
+    const width = box.clientWidth;
+    box.style.height = (width / aspectRatio) + 'px';
+  }
+}
+
 function adjustFontSize() {
   const outputBox = document.getElementById('outputBox');
   const textElem = document.getElementById('textContent');
@@ -261,8 +283,8 @@ function adjustFontSize() {
     textElem.style.color = textColor;
     textElem.textContent = text;
 
-  // Set aspect ratio (respected on mobile and desktop)
-  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  // Set or calculate aspect ratio
+  updateAspectRatio(aspectRatio);
 
   // Preview info
   document.getElementById('sizeInfo').innerHTML =
@@ -283,7 +305,7 @@ function updateBackground() {
 
 function updateStampVersion() {
   const aspectRatio = document.getElementById('stampLengthSelect').value;
-  document.getElementById('outputBox').style.aspectRatio = `${aspectRatio} / 1`;
+  updateAspectRatio(aspectRatio);
   const link = document.getElementById('productLinkEN');
   if (aspectRatio == '6') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert';
   else if (aspectRatio == '11') link.href = 'https://www.dhinotec.com/product-page/inkrunner-set-personalisiert-20-cm';
@@ -292,8 +314,17 @@ function updateStampVersion() {
 }
 
 // Events
-['inputText', 'fontSelect', 'boldCheck', 'textColor'].forEach(id =>
+['inputText', 'textColor'].forEach(id =>
   document.getElementById(id).addEventListener('input', adjustFontSize));
+
+document.getElementById('boldCheck').addEventListener('input', () => {
+  loadSelectedFont().then(adjustFontSize);
+});
+
+document.getElementById('fontSelect').addEventListener('change', () => {
+  loadSelectedFont().then(adjustFontSize);
+});
+
 ['backgroundSelect', 'stampLengthSelect'].forEach(id =>
   document.getElementById(id).addEventListener('change',
     id === 'backgroundSelect' ? updateBackground : updateStampVersion)
@@ -305,6 +336,13 @@ document.fonts.ready.then(() => {
   updateBackground();
   updateStampVersion();
 });
+
+if (!CSS.supports('aspect-ratio: 1 / 1')) {
+  window.addEventListener('resize', () => {
+    const ratio = document.getElementById('stampLengthSelect').value;
+    updateAspectRatio(ratio);
+  });
+}
 </script>
 </body>
 </html>
