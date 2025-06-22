@@ -239,6 +239,13 @@ function updateAspectRatio(aspectRatio) {
   }
 }
 
+const DESKTOP_OFFSETS = { boxPadding: 10, widthOffset: 15, heightOffset: 7 };
+const MOBILE_OFFSETS = { boxPadding: 10, widthOffset: 15, heightOffset: 7 };
+
+function getOffsets() {
+  return window.innerWidth <= 750 ? MOBILE_OFFSETS : DESKTOP_OFFSETS;
+}
+
 function adjustFontSize() {
   const outputBox = document.getElementById('outputBox');
   const textElem = document.getElementById('textContent');
@@ -264,8 +271,9 @@ function adjustFontSize() {
   // Flexible font size but minimum height indicated by lines
   let fontSize = 200;
   const ctx = document.createElement('canvas').getContext('2d');
-  const boxWidth = outputBox.clientWidth - 10;
-  const boxHeight = outputBox.clientHeight - 10;
+  const { boxPadding, widthOffset, heightOffset } = getOffsets();
+  const boxWidth = outputBox.clientWidth - boxPadding;
+  const boxHeight = outputBox.clientHeight - boxPadding;
 
   // Only scale down when text is too large
   while (fontSize > 10) {
@@ -273,7 +281,8 @@ function adjustFontSize() {
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-    if (textWidth - 15 <= boxWidth && textHeight - 7 <= boxHeight) break;
+    if (textWidth - widthOffset <= boxWidth &&
+        textHeight - heightOffset <= boxHeight) break;
     fontSize--;
   }
 
