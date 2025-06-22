@@ -294,8 +294,11 @@ function adjustFontSize() {
 
   if (font === 'MarshStencil' && window.innerWidth <= 750) {
     textElem.style.lineHeight = '0.85';
+    textElem.style.transform = 'translateY(7%)';
   } else {
     textElem.style.lineHeight = '';
+    textElem.style.transform = '';
+
   }
 
   // Set or calculate aspect ratio
