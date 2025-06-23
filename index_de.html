@@ -84,6 +84,16 @@
       width: 100%;
       text-align: center;
     }
+    #textContent.vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+    }
+    #textContent.vertical span {
+      display: block;
+      transform: rotate(90deg);
+    }
 
     .min-height-line {
       position: absolute;
@@ -196,6 +206,8 @@
     <input type="color" id="textColor" value="#000000">
     <input type="checkbox" id="boldCheck">
     <label for="boldCheck">Fett</label>
+    <input type="checkbox" id="verticalCheck" style="margin-left:10px;">
+    <label for="verticalCheck">90° gedreht</label>
   </div>
   <div class="form-group">
     <label for="backgroundSelect">Untergrund:</label>
@@ -253,6 +265,7 @@ function adjustFontSize() {
   const inputTextField = document.getElementById('inputText');
   const aspectRatio = document.getElementById('stampLengthSelect').value;
   const font = document.getElementById('fontSelect').value;
+  const vertical = document.getElementById('verticalCheck').checked;
 
   let fontStack;
   if (font === 'MarshStencil') {
@@ -276,24 +289,41 @@ function adjustFontSize() {
   const boxWidth = outputBox.clientWidth - boxPadding;
   const boxHeight = outputBox.clientHeight - boxPadding;
 
+  const letters = Array.from(text);
   // Nur runterskalieren, wenn Text zu groß
   while (fontSize > 10) {
     ctx.font = `${bold} ${fontSize}px ${fontStack}`;
-    const metrics = ctx.measureText(text);
-    const textWidth = metrics.width;
-    const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    let textWidth = 0;
+    let textHeight = 0;
+    if (vertical) {
+      letters.forEach(ch => {
+        const m = ctx.measureText(ch);
+        textWidth = Math.max(textWidth, m.width);
+        textHeight += m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+      });
+    } else {
+      const m = ctx.measureText(text);
+      textWidth = m.width;
+      textHeight = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+    }
     if (textWidth - widthOffset <= boxWidth &&
         textHeight - heightOffset <= boxHeight) break;
     fontSize--;
   }
 
   textElem.style.fontFamily = fontStack;
-    textElem.style.fontWeight = bold;
-    textElem.style.fontSize = fontSize + 'px';
-    textElem.style.color = textColor;
+  textElem.style.fontWeight = bold;
+  textElem.style.fontSize = fontSize + 'px';
+  textElem.style.color = textColor;
+  if (vertical) {
+    textElem.classList.add('vertical');
+    textElem.innerHTML = letters.map(ch => `<span>${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+  } else {
+    textElem.classList.remove('vertical');
     textElem.textContent = text;
+  }
 
-  if (font === 'MarshStencil' && window.innerWidth <= 750) {
+  if (font === 'MarshStencil' && window.innerWidth <= 750 && !vertical) {
     textElem.style.lineHeight = '0.85';
     textElem.style.transform = 'translateY(7%)';
   } else {
@@ -333,7 +363,7 @@ function updateStampVersion() {
 }
 
 // Events
-['inputText', 'textColor'].forEach(id =>
+['inputText', 'textColor', 'verticalCheck'].forEach(id =>
   document.getElementById(id).addEventListener('input', adjustFontSize));
 
 document.getElementById('boldCheck').addEventListener('input', () => {
